@@ -1,0 +1,41 @@
+@mixin profile() {
+    border: 2px solid #e0e0e0;
+    border-top: 3px solid deepskyblue;
+    margin: 10px;
+
+    figure {
+        width: 100px;
+        vertical-align: top;
+        margin: 10px 10px;
+        margin-left: auto;
+        margin-right: auto;
+
+        img {
+            width: inherit;
+            height: inherit;
+            border-radius: 50px;
+        }
+
+        figcaption {
+            font-style: italic;
+            font-size: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+    aside {
+        vertical-align: top;
+        margin: 10px 10px;
+
+
+        strong {
+            display: block;
+            text-transform: capitalize;
+        }
+
+        span {
+            color: #A8A8AD;
+            text-transform: capitalize;
+        }
+    }
+}

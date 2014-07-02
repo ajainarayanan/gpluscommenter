@@ -1,0 +1,24 @@
+@import "./profile";
+
+.sidebar {
+    .gplus{
+      display: inline-block;
+      vertical-align: top;
+        .title-icon {
+            &.gplus {
+                border-bottom: 3px solid #1BA1E2;
+            }
+        }
+        .button {
+            &.gPlusLogin {
+                background: #7BA5EB;
+                width: inherit;
+            }
+        }
+        .tabBody {
+            &.gplus {
+                display: inline-block;
+            }
+        }
+    }
+}

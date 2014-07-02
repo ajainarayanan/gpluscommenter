@@ -1,0 +1,18 @@
+{
+  "name": "sidebar",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "0.4.1",
+    "component-builder-handlebars": "0.2.0",
+    "grunt-component-build": "*",
+    "grunt-contrib-clean": "0.5.0",
+    "grunt-contrib-jshint": "0.6.5",
+    "time-grunt": "0.1.2",
+    "load-grunt-tasks": "0.1.3",
+    "underscore": "1.5.2",
+    "express": "~3.4.3"
+  },
+  "engine": {
+    "node": ">=0.10.0"
+  }
+}

@@ -1,0 +1,10 @@
+.sidebar .gplus {
+  display: inline-block;
+  vertical-align: top; }
+  .sidebar .gplus .title-icon.gplus {
+    border-bottom: 3px solid #1BA1E2; }
+  .sidebar .gplus .button.gPlusLogin {
+    background: #7BA5EB;
+    width: inherit; }
+  .sidebar .gplus .tabBody.gplus {
+    display: inline-block; }

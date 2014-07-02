@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Sidebar example </title>
+    <script src="https://apis.google.com/js/plusone.js"> </script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"> </script>
+    <link rel="stylesheep" href="./styles/prettify.css">
+    <link rel="stylesheet" href="./build/sidebar.css">
+    <script src="./styles/prettify.js"> </script>
+    <style type="text/css">
+      body {
+        background: #DD4B39;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    <h1 class="page-header"> G+ Commenter </h1>
+    <div class="faq">
+      <h3> What is it? </h3>
+      <p> G+ Commenter is a small component that you can add to your Website/Blog.
+          This greatly simplifies the commenting in your blog.
+      </p>
+    </div>
+    <div class="faq">
+      <h3> Is it for the entire blog or the homepage? </h3>
+      <p> It serves a new set of comments for each unique link of your blog/website.</p>
+    </div>
+    <div class="faq">
+      <h3> What is the advantage? </h3>
+      <p> Nothing big. You can write a commenting module  or you could include
+          simple G+ Commenter js & css file in your homepage and let it take care of
+          the commenting for you.
+
+          Simple and straight forward.
+    </div>
+    <div class="faq">
+      <h3> Want to explore the component(...ish) </h3>
+      <pre class="prettyprint linenums">
+&gt; git clone ajainarayanan/GplusCommenter
+&gt; cd GplusCommenter
+&gt; npm install
+&gt; grunt
+&gt; nodemon server.js/node server.js
+&gt; Go to http://localhost:3000/ and you should see
+this page with the sidebar attached to the page.
+      </pre>
+    </div>
+  </div>
+  </body>
+  <script src="./build/sidebar.js"> </script>
+
+</html>

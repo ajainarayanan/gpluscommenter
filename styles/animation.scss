@@ -1,0 +1,37 @@
+$maxWidth: -340px;
+$minWidth: 5px;
+
+@keyframes pull{
+    0% {
+        right: $maxWidth;
+    }
+    100% {
+        right: -$minWidth;
+    }
+}
+
+@-webkit-keyframes pull {
+    0% {
+        right: $maxWidth;
+    }
+    100% {
+        right: $minWidth;
+    }
+}
+@keyframes push {
+    0% {
+        right: $minWidth;
+    }
+    100% {
+        right: $maxWidth;
+    }
+}
+
+@-webkit-keyframes push {
+    0% {
+        right: $minWidth;
+    }
+    100% {
+        right: $maxWidth;
+    }
+}

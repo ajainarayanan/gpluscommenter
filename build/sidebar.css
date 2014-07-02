@@ -1,0 +1,100 @@
+@keyframes pull {
+  0% {
+    right: -340px; }
+
+  100% {
+    right: -5px; } }
+@-webkit-keyframes pull {
+  0% {
+    right: -340px; }
+
+  100% {
+    right: 5px; } }
+@keyframes push {
+  0% {
+    right: 5px; }
+
+  100% {
+    right: -340px; } }
+@-webkit-keyframes push {
+  0% {
+    right: 5px; }
+
+  100% {
+    right: -340px; } }
+@font-face {
+  font-family: 'icomoon';
+  src: url("sidebar/styles/fonts/icomoon.eot?-v1jwtk");
+  src: url("sidebar/styles/fonts/icomoon.eot?#iefix-v1jwtk") format("embedded-opentype"), url("sidebar/styles/fonts/icomoon.woff?-v1jwtk") format("woff"), url("sidebar/styles/fonts/icomoon.ttf?-v1jwtk") format("truetype"), url("sidebar/styles/fonts/icomoon.svg?-v1jwtk#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'icomoon';
+  speak: none;
+  font-size: 200%;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+.icon-google-plus:before {
+  content: "\e600"; }
+
+.icon-facebook:before {
+  content: "\e601"; }
+
+.icon-twitter:before {
+  content: "\e602"; }
+
+.icon-reddit:before {
+  content: "\e603"; }
+
+.icon-windows8:before {
+  content: "\e604"; }
+
+.sidebar {
+  animation: push 1s forwards;
+  -webkit-animation: push 1s forwards;
+  padding: 30px 0px;
+  background: transparent;
+  display: inline-block;
+  position: fixed;
+  margin: 0px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  width: auto;
+  z-index: 10000009922;
+  position: absolute;
+  top: 0; }
+  .sidebar .commentsWrapper {
+    display: inline-block; }
+    .sidebar .commentsWrapper .holder {
+      height: 100%;
+      border: 1px solid #B0B0B0;
+      background: transparent;
+      display: inline-block; }
+      .sidebar .commentsWrapper .holder.visible {
+        right: 50px; }
+  .sidebar.pullLeft {
+    animation: pull 1s forwards;
+    -webkit-animation: pull 1s forwards; }
+  .sidebar .hide {
+    display: none; }
+
+
+.sidebar .gplus {
+  display: inline-block;
+  vertical-align: top; }
+  .sidebar .gplus .title-icon.gplus {
+    border-bottom: 3px solid #1BA1E2; }
+  .sidebar .gplus .button.gPlusLogin {
+    background: #7BA5EB;
+    width: inherit; }
+  .sidebar .gplus .tabBody.gplus {
+    display: inline-block; }
+
+

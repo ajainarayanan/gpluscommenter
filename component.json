@@ -1,0 +1,30 @@
+{
+  "name": "sidebar",
+  "repo": "ajainarayanan/sidebar",
+  "description": "A sidebar container to hold any dynamic content",
+  "version": "0.0.1",
+  "keywords": [],
+  "development": { },
+  "scripts": [
+    "scripts/sidebar.js"
+  ],
+  "main": "scripts/sidebar.js",
+  "templates": [
+    "templates/sidebar.hbs"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "components/jquery": "*",
+    "lodash/lodash": "*"
+  },
+  "styles": [
+    "styles/sidebar.css",
+    "styles/gPlus.css"
+  ],
+  "files": [
+    "styles/fonts/icomoon.eot",
+    "styles/fonts/icomoon.svg",
+    "styles/fonts/icomoon.ttf",
+    "styles/fonts/icomoon.woff"
+  ]
+}
