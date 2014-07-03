@@ -7,6 +7,7 @@ module.exports = function(grunt) {
   component = {
     options: {
       verbose: false,
+      standalone: true,
       dev: true,
       name: "sidebar",
       sourceUrls: true,

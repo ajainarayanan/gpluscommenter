@@ -1,3 +1,6 @@
+
+;(function(){
+
 /**
  * Require the module at `name`.
  *
@@ -16489,4 +16492,11 @@ require.define("sidebar/templates/sidebar.hbs", "<div class=\"sidebar\">\n  <div
 require.modules["sidebar"] = require.modules["sidebar"];
 
 
-require("sidebar")
+if (typeof exports == "object") {
+  module.exports = require("sidebar");
+} else if (typeof define == "function" && define.amd) {
+  define([], function(){ return require("sidebar"); });
+} else {
+  this["sidebar"] = require("sidebar");
+}
+})()
