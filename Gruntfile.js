@@ -7,6 +7,7 @@ module.exports = function(grunt) {
   component = {
     options: {
       verbose: false,
+      copy: true,
       dev: true,
       name: "sidebar",
       sourceUrls: true,
@@ -24,6 +25,7 @@ module.exports = function(grunt) {
   dist = underscore.extend(underscore.clone(component), {
     options: {
       dev: false,
+      copy: true,
       verbose: true,
       name: 'sidebar',
       configure: function(builder) {
