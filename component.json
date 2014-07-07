@@ -18,8 +18,7 @@
     "lodash/lodash": "*"
   },
   "styles": [
-    "styles/sidebar.css",
-    "styles/gPlus.css"
+    "styles/sidebar.css"
   ],
   "files": [
     "styles/fonts/icomoon.eot",

@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   var hbs, component;
   require("load-grunt-tasks")(grunt);
   var underscore = require("underscore");
+  grunt.loadNpmTasks('grunt-contrib-sass');
   hbs = require("component-builder-handlebars");
 
   component = {
@@ -41,10 +42,21 @@ module.exports = function(grunt) {
     componentbuild: {
       build: component,
       dist: dist
+    },
+    sass: {
+      build: {
+        option: {
+          style: 'expanded'
+        },
+        files: {
+          'styles/sidebar.css': 'styles/sidebar.scss'
+        }
+      }
     }
   });
 
   grunt.registerTask("build", [
+    "sass",
     "componentbuild:build"
   ]);
   grunt.registerTask("prod", [

@@ -56,6 +56,17 @@
 .icon-windows8:before {
   content: "\e604"; }
 
+.sidebar .gplus {
+  display: inline-block;
+  vertical-align: top; }
+  .sidebar .gplus .title-icon.gplus {
+    border-bottom: 3px solid #1BA1E2; }
+  .sidebar .gplus .button.gPlusLogin {
+    background: #7BA5EB;
+    width: inherit; }
+  .sidebar .gplus .tabBody.gplus {
+    display: inline-block; }
+
 .sidebar {
   animation: push 1s forwards;
   -webkit-animation: push 1s forwards;
@@ -68,7 +79,7 @@
   font-size: 16px;
   width: auto;
   z-index: 10000009922;
-  position: absolute;
+  position: fixed;
   top: 0; }
   .sidebar .commentsWrapper {
     display: inline-block; }
