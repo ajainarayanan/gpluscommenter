@@ -1,18 +1,18 @@
-$maxWidth: -340px;
+$maxWidth: 50%;
 $minWidth: 5px;
 
 @keyframes pull{
     0% {
-        right: $maxWidth;
+        right: -($maxWidth);
     }
     100% {
-        right: -$minWidth;
+        right: $minWidth;
     }
 }
 
 @-webkit-keyframes pull {
     0% {
-        right: $maxWidth;
+        right: -($maxWidth);
     }
     100% {
         right: $minWidth;
@@ -23,7 +23,7 @@ $minWidth: 5px;
         right: $minWidth;
     }
     100% {
-        right: $maxWidth;
+        right: -($maxWidth);
     }
 }
 
@@ -32,6 +32,6 @@ $minWidth: 5px;
         right: $minWidth;
     }
     100% {
-        right: $maxWidth;
+        right: -($maxWidth);
     }
 }

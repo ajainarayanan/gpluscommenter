@@ -16446,6 +16446,7 @@ require.register("sidebar", Function("exports, module",
 \n\
 var template = require(\"sidebar/templates/sidebar.hbs\");\n\
 var jquery = require(\"components~jquery@2.1.0\");\n\
+var lodash = require(\"lodash~lodash@2.4.1\");\n\
 \n\
 function sidebar(deferredLoading) {\n\
 \n\
@@ -16454,23 +16455,34 @@ function sidebar(deferredLoading) {\n\
       var target = jquery(event.target);\n\
       target.parent(\".sidebar\").toggleClass(\"pullLeft\");\n\
     });\n\
+    jquery(window).resize(lodash.debounce(function onResize(event) {\n\
+      resizeHandler(event);\n\
+    }, 200));\n\
+  }\n\
+  function resizeHandler(e) {\n\
+    this.element.find(\"#commentsholder\").empty();\n\
+    loadComments(this.url);\n\
   }\n\
 \n\
   function attach(element, url) {\n\
     var el = element || \"body\";\n\
     jquery(el).append(template);\n\
     this.element = jquery(el).find(\".sidebar\");\n\
+    this.url = url || window.location;\n\
     bindEvents();\n\
     loadComments(url);\n\
   }\n\
+\n\
   function loadComments(url) {\n\
+    var sidebarWidth = parseInt(jquery(\"body\").css(\"width\") || 0, 10);\n\
     gapi.comments.render(\"commentsholder\", {\n\
       href: url || window.location,\n\
-      width: '321',\n\
+      width: Math.round((sidebarWidth * (1/2)).toString()),\n\
       first_party_property: 'BLOGGER',\n\
       view_type: 'FILTERED_POSTMOD'\n\
     });\n\
   }\n\
+\n\
   if (!deferredLoading) {\n\
       attach();\n\
   }\n\
@@ -16484,7 +16496,7 @@ module.exports = sidebar();\n\
 //# sourceURL=scripts/sidebar.js"
 ));
 
-require.define("sidebar/templates/sidebar.hbs", "<div class=\"sidebar\">\n  <div class=\"gplus title-icon icon-google-plus\" attachpoint= \"tabIcon\" name=\"gplus\"></div>\n  <div class=\"commentsWrapper\">\n    <div class=\"comments holder\" id=\"commentsholder\">\n\n    <div>\n  </div>\n</div>\n");
+require.define("sidebar/templates/sidebar.hbs", "<div class=\"sidebar pull\">\n  <div class=\"gplus title-icon icon-google-plus\" attachpoint= \"tabIcon\" name=\"gplus\"></div>\n  <div class=\"commentsWrapper\">\n    <div class=\"comments holder\" id=\"commentsholder\">\n\n    <div>\n  </div>\n</div>\n");
 
 require.modules["sidebar"] = require.modules["sidebar"];
 
