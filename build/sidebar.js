@@ -16562,7 +16562,15 @@ function sidebar(deferredLoading) {\n\
   }\n\
 \n\
   if (!deferredLoading) {\n\
-      attach();\n\
+      if (angular && angular.element) {\n\
+        angular.element(document).ready(function() {\n\
+          attach();\n\
+        }.bind(this))\n\
+      } else {\n\
+        jquery(document).ready(function() {\n\
+          attach();\n\
+        }.bind(this));\n\
+      }\n\
   }\n\
   return {\n\
     attach: attach,\n\

@@ -40,7 +40,15 @@ function sidebar(deferredLoading) {
   }
 
   if (!deferredLoading) {
-      attach();
+      if (angular && angular.element) {
+        angular.element(document).ready(function() {
+          attach();
+        }.bind(this))
+      } else {
+        jquery(document).ready(function() {
+          attach();
+        }.bind(this));
+      }
   }
   return {
     attach: attach,

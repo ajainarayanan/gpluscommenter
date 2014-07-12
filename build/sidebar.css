@@ -73,8 +73,7 @@
     font-size: 300%; } }
 .sidebar .gplus {
   display: inline-block;
-  vertical-align: top;
-  color: #DD4B39; }
+  vertical-align: top; }
   .sidebar .gplus .title-icon.gplus {
     border-bottom: 3px solid #1BA1E2; }
   .sidebar .gplus .button.gPlusLogin {
