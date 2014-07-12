@@ -52,9 +52,9 @@ require.define = function (name, exports) {
     exports: exports
   };
 };
-require.register("components~jquery@2.1.0", Function("exports, module",
+require.register("components~jquery@2.1.1", Function("exports, module",
 "/*!\n\
- * jQuery JavaScript Library v2.1.0\n\
+ * jQuery JavaScript Library v2.1.1\n\
  * http://jquery.com/\n\
  *\n\
  * Includes Sizzle.js\n\
@@ -64,7 +64,7 @@ require.register("components~jquery@2.1.0", Function("exports, module",
  * Released under the MIT license\n\
  * http://jquery.org/license\n\
  *\n\
- * Date: 2014-01-23T21:10Z\n\
+ * Date: 2014-05-01T17:11Z\n\
  */\n\
 \n\
 (function( global, factory ) {\n\
@@ -114,8 +114,6 @@ var toString = class2type.toString;\n\
 \n\
 var hasOwn = class2type.hasOwnProperty;\n\
 \n\
-var trim = \"\".trim;\n\
-\n\
 var support = {};\n\
 \n\
 \n\
@@ -124,7 +122,7 @@ var\n\
 \t// Use the correct document accordingly with window argument (sandbox)\n\
 \tdocument = window.document,\n\
 \n\
-\tversion = \"2.1.0\",\n\
+\tversion = \"2.1.1\",\n\
 \n\
 \t// Define a local copy of jQuery\n\
 \tjQuery = function( selector, context ) {\n\
@@ -132,6 +130,10 @@ var\n\
 \t\t// Need init if jQuery is called (just allow error to be thrown if not included)\n\
 \t\treturn new jQuery.fn.init( selector, context );\n\
 \t},\n\
+\n\
+\t// Support: Android<4.1\n\
+\t// Make sure we trim BOM and NBSP\n\
+\trtrim = /^[\\s\\uFEFF\\xA0]+|[\\s\\uFEFF\\xA0]+$/g,\n\
 \n\
 \t// Matches dashed string for camelizing\n\
 \trmsPrefix = /^-ms-/,\n\
@@ -163,10 +165,10 @@ jQuery.fn = jQuery.prototype = {\n\
 \tget: function( num ) {\n\
 \t\treturn num != null ?\n\
 \n\
-\t\t\t// Return a 'clean' array\n\
+\t\t\t// Return just the one element from the set\n\
 \t\t\t( num < 0 ? this[ num + this.length ] : this[ num ] ) :\n\
 \n\
-\t\t\t// Return just the object\n\
+\t\t\t// Return all the elements in a clean array\n\
 \t\t\tslice.call( this );\n\
 \t},\n\
 \n\
@@ -322,7 +324,7 @@ jQuery.extend({\n\
 \t\t// parseFloat NaNs numeric-cast false positives (null|true|false|\"\")\n\
 \t\t// ...but misinterprets leading-number strings, particularly hex literals (\"0x...\")\n\
 \t\t// subtraction forces infinities to NaN\n\
-\t\treturn obj - parseFloat( obj ) >= 0;\n\
+\t\treturn !jQuery.isArray( obj ) && obj - parseFloat( obj ) >= 0;\n\
 \t},\n\
 \n\
 \tisPlainObject: function( obj ) {\n\
@@ -334,16 +336,8 @@ jQuery.extend({\n\
 \t\t\treturn false;\n\
 \t\t}\n\
 \n\
-\t\t// Support: Firefox <20\n\
-\t\t// The try/catch suppresses exceptions thrown when attempting to access\n\
-\t\t// the \"constructor\" property of certain host objects, ie. |window.location|\n\
-\t\t// https://bugzilla.mozilla.org/show_bug.cgi?id=814622\n\
-\t\ttry {\n\
-\t\t\tif ( obj.constructor &&\n\
-\t\t\t\t\t!hasOwn.call( obj.constructor.prototype, \"isPrototypeOf\" ) ) {\n\
-\t\t\t\treturn false;\n\
-\t\t\t}\n\
-\t\t} catch ( e ) {\n\
+\t\tif ( obj.constructor &&\n\
+\t\t\t\t!hasOwn.call( obj.constructor.prototype, \"isPrototypeOf\" ) ) {\n\
 \t\t\treturn false;\n\
 \t\t}\n\
 \n\
@@ -453,8 +447,11 @@ jQuery.extend({\n\
 \t\treturn obj;\n\
 \t},\n\
 \n\
+\t// Support: Android<4.1\n\
 \ttrim: function( text ) {\n\
-\t\treturn text == null ? \"\" : trim.call( text );\n\
+\t\treturn text == null ?\n\
+\t\t\t\"\" :\n\
+\t\t\t( text + \"\" ).replace( rtrim, \"\" );\n\
 \t},\n\
 \n\
 \t// results is for internal usage only\n\
@@ -606,14 +603,14 @@ function isArraylike( obj ) {\n\
 }\n\
 var Sizzle =\n\
 /*!\n\
- * Sizzle CSS Selector Engine v1.10.16\n\
+ * Sizzle CSS Selector Engine v1.10.19\n\
  * http://sizzlejs.com/\n\
  *\n\
  * Copyright 2013 jQuery Foundation, Inc. and other contributors\n\
  * Released under the MIT license\n\
  * http://jquery.org/license\n\
  *\n\
- * Date: 2014-01-13\n\
+ * Date: 2014-04-18\n\
  */\n\
 (function( window ) {\n\
 \n\
@@ -622,7 +619,9 @@ var i,\n\
 \tExpr,\n\
 \tgetText,\n\
 \tisXML,\n\
+\ttokenize,\n\
 \tcompile,\n\
+\tselect,\n\
 \toutermostContext,\n\
 \tsortInput,\n\
 \thasDuplicate,\n\
@@ -690,17 +689,23 @@ var i,\n\
 \t// Proper syntax: http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier\n\
 \tidentifier = characterEncoding.replace( \"w\", \"w#\" ),\n\
 \n\
-\t// Acceptable operators http://www.w3.org/TR/selectors/#attribute-selectors\n\
-\tattributes = \"\\\\[\" + whitespace + \"*(\" + characterEncoding + \")\" + whitespace +\n\
-\t\t\"*(?:([*^$|!~]?=)\" + whitespace + \"*(?:(['\\\"])((?:\\\\\\\\.|[^\\\\\\\\])*?)\\\\3|(\" + identifier + \")|)|)\" + whitespace + \"*\\\\]\",\n\
+\t// Attribute selectors: http://www.w3.org/TR/selectors/#attribute-selectors\n\
+\tattributes = \"\\\\[\" + whitespace + \"*(\" + characterEncoding + \")(?:\" + whitespace +\n\
+\t\t// Operator (capture 2)\n\
+\t\t\"*([*^$|!~]?=)\" + whitespace +\n\
+\t\t// \"Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]\"\n\
+\t\t\"*(?:'((?:\\\\\\\\.|[^\\\\\\\\'])*)'|\\\"((?:\\\\\\\\.|[^\\\\\\\\\\\"])*)\\\"|(\" + identifier + \"))|)\" + whitespace +\n\
+\t\t\"*\\\\]\",\n\
 \n\
-\t// Prefer arguments quoted,\n\
-\t//   then not containing pseudos/brackets,\n\
-\t//   then attribute selectors/non-parenthetical expressions,\n\
-\t//   then anything else\n\
-\t// These preferences are here to reduce the number of selectors\n\
-\t//   needing tokenize in the PSEUDO preFilter\n\
-\tpseudos = \":(\" + characterEncoding + \")(?:\\\\(((['\\\"])((?:\\\\\\\\.|[^\\\\\\\\])*?)\\\\3|((?:\\\\\\\\.|[^\\\\\\\\()[\\\\]]|\" + attributes.replace( 3, 8 ) + \")*)|.*)\\\\)|)\",\n\
+\tpseudos = \":(\" + characterEncoding + \")(?:\\\\((\" +\n\
+\t\t// To reduce the number of selectors needing tokenize in the preFilter, prefer arguments:\n\
+\t\t// 1. quoted (capture 3; capture 4 or capture 5)\n\
+\t\t\"('((?:\\\\\\\\.|[^\\\\\\\\'])*)'|\\\"((?:\\\\\\\\.|[^\\\\\\\\\\\"])*)\\\")|\" +\n\
+\t\t// 2. simple (capture 6)\n\
+\t\t\"((?:\\\\\\\\.|[^\\\\\\\\()[\\\\]]|\" + attributes + \")*)|\" +\n\
+\t\t// 3. anything else (capture 2)\n\
+\t\t\".*\" +\n\
+\t\t\")\\\\)|)\",\n\
 \n\
 \t// Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter\n\
 \trtrim = new RegExp( \"^\" + whitespace + \"+|((?:^|[^\\\\\\\\])(?:\\\\\\\\.)*)\" + whitespace + \"+$\", \"g\" ),\n\
@@ -745,7 +750,7 @@ var i,\n\
 \tfunescape = function( _, escaped, escapedWhitespace ) {\n\
 \t\tvar high = \"0x\" + escaped - 0x10000;\n\
 \t\t// NaN means non-codepoint\n\
-\t\t// Support: Firefox\n\
+\t\t// Support: Firefox<24\n\
 \t\t// Workaround erroneous numeric interpretation of +\"0x\"\n\
 \t\treturn high !== high || escapedWhitespace ?\n\
 \t\t\tescaped :\n\
@@ -1141,7 +1146,7 @@ setDocument = Sizzle.setDocument = function( node ) {\n\
 \t\t\t\tvar m = context.getElementById( id );\n\
 \t\t\t\t// Check parentNode to catch when Blackberry 4.6 returns\n\
 \t\t\t\t// nodes that are no longer in the document #6963\n\
-\t\t\t\treturn m && m.parentNode ? [m] : [];\n\
+\t\t\t\treturn m && m.parentNode ? [ m ] : [];\n\
 \t\t\t}\n\
 \t\t};\n\
 \t\tExpr.filter[\"ID\"] = function( id ) {\n\
@@ -1221,11 +1226,13 @@ setDocument = Sizzle.setDocument = function( node ) {\n\
 \t\t\t// setting a boolean content attribute,\n\
 \t\t\t// since its presence should be enough\n\
 \t\t\t// http://bugs.jquery.com/ticket/12359\n\
-\t\t\tdiv.innerHTML = \"<select t=''><option selected=''></option></select>\";\n\
+\t\t\tdiv.innerHTML = \"<select msallowclip=''><option selected=''></option></select>\";\n\
 \n\
-\t\t\t// Support: IE8, Opera 10-12\n\
+\t\t\t// Support: IE8, Opera 11-12.16\n\
 \t\t\t// Nothing should be selected when empty strings follow ^= or $= or *=\n\
-\t\t\tif ( div.querySelectorAll(\"[t^='']\").length ) {\n\
+\t\t\t// The test attribute must be unknown in Opera but \"safe\" for WinRT\n\
+\t\t\t// http://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section\n\
+\t\t\tif ( div.querySelectorAll(\"[msallowclip^='']\").length ) {\n\
 \t\t\t\trbuggyQSA.push( \"[*^$]=\" + whitespace + \"*(?:''|\\\"\\\")\" );\n\
 \t\t\t}\n\
 \n\
@@ -1268,7 +1275,8 @@ setDocument = Sizzle.setDocument = function( node ) {\n\
 \t\t});\n\
 \t}\n\
 \n\
-\tif ( (support.matchesSelector = rnative.test( (matches = docElem.webkitMatchesSelector ||\n\
+\tif ( (support.matchesSelector = rnative.test( (matches = docElem.matches ||\n\
+\t\tdocElem.webkitMatchesSelector ||\n\
 \t\tdocElem.mozMatchesSelector ||\n\
 \t\tdocElem.oMatchesSelector ||\n\
 \t\tdocElem.msMatchesSelector) )) ) {\n\
@@ -1449,7 +1457,7 @@ Sizzle.matchesSelector = function( elem, expr ) {\n\
 \t\t} catch(e) {}\n\
 \t}\n\
 \n\
-\treturn Sizzle( expr, document, null, [elem] ).length > 0;\n\
+\treturn Sizzle( expr, document, null, [ elem ] ).length > 0;\n\
 };\n\
 \n\
 Sizzle.contains = function( context, elem ) {\n\
@@ -1578,7 +1586,7 @@ Expr = Sizzle.selectors = {\n\
 \t\t\tmatch[1] = match[1].replace( runescape, funescape );\n\
 \n\
 \t\t\t// Move the given value to match[3] whether quoted or unquoted\n\
-\t\t\tmatch[3] = ( match[4] || match[5] || \"\" ).replace( runescape, funescape );\n\
+\t\t\tmatch[3] = ( match[3] || match[4] || match[5] || \"\" ).replace( runescape, funescape );\n\
 \n\
 \t\t\tif ( match[2] === \"~=\" ) {\n\
 \t\t\t\tmatch[3] = \" \" + match[3] + \" \";\n\
@@ -1621,15 +1629,15 @@ Expr = Sizzle.selectors = {\n\
 \n\
 \t\t\"PSEUDO\": function( match ) {\n\
 \t\t\tvar excess,\n\
-\t\t\t\tunquoted = !match[5] && match[2];\n\
+\t\t\t\tunquoted = !match[6] && match[2];\n\
 \n\
 \t\t\tif ( matchExpr[\"CHILD\"].test( match[0] ) ) {\n\
 \t\t\t\treturn null;\n\
 \t\t\t}\n\
 \n\
 \t\t\t// Accept quoted arguments as-is\n\
-\t\t\tif ( match[3] && match[4] !== undefined ) {\n\
-\t\t\t\tmatch[2] = match[4];\n\
+\t\t\tif ( match[3] ) {\n\
+\t\t\t\tmatch[2] = match[4] || match[5] || \"\";\n\
 \n\
 \t\t\t// Strip excess characters from unquoted arguments\n\
 \t\t\t} else if ( unquoted && rpseudo.test( unquoted ) &&\n\
@@ -2034,7 +2042,7 @@ function setFilters() {}\n\
 setFilters.prototype = Expr.filters = Expr.pseudos;\n\
 Expr.setFilters = new setFilters();\n\
 \n\
-function tokenize( selector, parseOnly ) {\n\
+tokenize = Sizzle.tokenize = function( selector, parseOnly ) {\n\
 \tvar matched, match, tokens, type,\n\
 \t\tsoFar, groups, preFilters,\n\
 \t\tcached = tokenCache[ selector + \" \" ];\n\
@@ -2099,7 +2107,7 @@ function tokenize( selector, parseOnly ) {\n\
 \t\t\tSizzle.error( selector ) :\n\
 \t\t\t// Cache the tokens\n\
 \t\t\ttokenCache( selector, groups ).slice( 0 );\n\
-}\n\
+};\n\
 \n\
 function toSelector( tokens ) {\n\
 \tvar i = 0,\n\
@@ -2176,6 +2184,15 @@ function elementMatcher( matchers ) {\n\
 \t\t\treturn true;\n\
 \t\t} :\n\
 \t\tmatchers[0];\n\
+}\n\
+\n\
+function multipleContexts( selector, contexts, results ) {\n\
+\tvar i = 0,\n\
+\t\tlen = contexts.length;\n\
+\tfor ( ; i < len; i++ ) {\n\
+\t\tSizzle( selector, contexts[i], results );\n\
+\t}\n\
+\treturn results;\n\
 }\n\
 \n\
 function condense( unmatched, map, filter, context, xml ) {\n\
@@ -2446,7 +2463,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {\n\
 \t\tsuperMatcher;\n\
 }\n\
 \n\
-compile = Sizzle.compile = function( selector, group /* Internal Use Only */ ) {\n\
+compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {\n\
 \tvar i,\n\
 \t\tsetMatchers = [],\n\
 \t\telementMatchers = [],\n\
@@ -2454,12 +2471,12 @@ compile = Sizzle.compile = function( selector, group /* Internal Use Only */ ) {
 \n\
 \tif ( !cached ) {\n\
 \t\t// Generate a function of recursive functions that can be used to check each element\n\
-\t\tif ( !group ) {\n\
-\t\t\tgroup = tokenize( selector );\n\
+\t\tif ( !match ) {\n\
+\t\t\tmatch = tokenize( selector );\n\
 \t\t}\n\
-\t\ti = group.length;\n\
+\t\ti = match.length;\n\
 \t\twhile ( i-- ) {\n\
-\t\t\tcached = matcherFromTokens( group[i] );\n\
+\t\t\tcached = matcherFromTokens( match[i] );\n\
 \t\t\tif ( cached[ expando ] ) {\n\
 \t\t\t\tsetMatchers.push( cached );\n\
 \t\t\t} else {\n\
@@ -2469,74 +2486,83 @@ compile = Sizzle.compile = function( selector, group /* Internal Use Only */ ) {
 \n\
 \t\t// Cache the compiled function\n\
 \t\tcached = compilerCache( selector, matcherFromGroupMatchers( elementMatchers, setMatchers ) );\n\
+\n\
+\t\t// Save selector and tokenization\n\
+\t\tcached.selector = selector;\n\
 \t}\n\
 \treturn cached;\n\
 };\n\
 \n\
-function multipleContexts( selector, contexts, results ) {\n\
-\tvar i = 0,\n\
-\t\tlen = contexts.length;\n\
-\tfor ( ; i < len; i++ ) {\n\
-\t\tSizzle( selector, contexts[i], results );\n\
-\t}\n\
-\treturn results;\n\
-}\n\
-\n\
-function select( selector, context, results, seed ) {\n\
+/**\n\
+ * A low-level selection function that works with Sizzle's compiled\n\
+ *  selector functions\n\
+ * @param {String|Function} selector A selector or a pre-compiled\n\
+ *  selector function built with Sizzle.compile\n\
+ * @param {Element} context\n\
+ * @param {Array} [results]\n\
+ * @param {Array} [seed] A set of elements to match against\n\
+ */\n\
+select = Sizzle.select = function( selector, context, results, seed ) {\n\
 \tvar i, tokens, token, type, find,\n\
-\t\tmatch = tokenize( selector );\n\
+\t\tcompiled = typeof selector === \"function\" && selector,\n\
+\t\tmatch = !seed && tokenize( (selector = compiled.selector || selector) );\n\
 \n\
-\tif ( !seed ) {\n\
-\t\t// Try to minimize operations if there is only one group\n\
-\t\tif ( match.length === 1 ) {\n\
+\tresults = results || [];\n\
 \n\
-\t\t\t// Take a shortcut and set the context if the root selector is an ID\n\
-\t\t\ttokens = match[0] = match[0].slice( 0 );\n\
-\t\t\tif ( tokens.length > 2 && (token = tokens[0]).type === \"ID\" &&\n\
-\t\t\t\t\tsupport.getById && context.nodeType === 9 && documentIsHTML &&\n\
-\t\t\t\t\tExpr.relative[ tokens[1].type ] ) {\n\
+\t// Try to minimize operations if there is no seed and only one group\n\
+\tif ( match.length === 1 ) {\n\
 \n\
-\t\t\t\tcontext = ( Expr.find[\"ID\"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];\n\
-\t\t\t\tif ( !context ) {\n\
-\t\t\t\t\treturn results;\n\
-\t\t\t\t}\n\
-\t\t\t\tselector = selector.slice( tokens.shift().value.length );\n\
+\t\t// Take a shortcut and set the context if the root selector is an ID\n\
+\t\ttokens = match[0] = match[0].slice( 0 );\n\
+\t\tif ( tokens.length > 2 && (token = tokens[0]).type === \"ID\" &&\n\
+\t\t\t\tsupport.getById && context.nodeType === 9 && documentIsHTML &&\n\
+\t\t\t\tExpr.relative[ tokens[1].type ] ) {\n\
+\n\
+\t\t\tcontext = ( Expr.find[\"ID\"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];\n\
+\t\t\tif ( !context ) {\n\
+\t\t\t\treturn results;\n\
+\n\
+\t\t\t// Precompiled matchers will still verify ancestry, so step up a level\n\
+\t\t\t} else if ( compiled ) {\n\
+\t\t\t\tcontext = context.parentNode;\n\
 \t\t\t}\n\
 \n\
-\t\t\t// Fetch a seed set for right-to-left matching\n\
-\t\t\ti = matchExpr[\"needsContext\"].test( selector ) ? 0 : tokens.length;\n\
-\t\t\twhile ( i-- ) {\n\
-\t\t\t\ttoken = tokens[i];\n\
+\t\t\tselector = selector.slice( tokens.shift().value.length );\n\
+\t\t}\n\
 \n\
-\t\t\t\t// Abort if we hit a combinator\n\
-\t\t\t\tif ( Expr.relative[ (type = token.type) ] ) {\n\
-\t\t\t\t\tbreak;\n\
-\t\t\t\t}\n\
-\t\t\t\tif ( (find = Expr.find[ type ]) ) {\n\
-\t\t\t\t\t// Search, expanding context for leading sibling combinators\n\
-\t\t\t\t\tif ( (seed = find(\n\
-\t\t\t\t\t\ttoken.matches[0].replace( runescape, funescape ),\n\
-\t\t\t\t\t\trsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context\n\
-\t\t\t\t\t)) ) {\n\
+\t\t// Fetch a seed set for right-to-left matching\n\
+\t\ti = matchExpr[\"needsContext\"].test( selector ) ? 0 : tokens.length;\n\
+\t\twhile ( i-- ) {\n\
+\t\t\ttoken = tokens[i];\n\
 \n\
-\t\t\t\t\t\t// If seed is empty or no tokens remain, we can return early\n\
-\t\t\t\t\t\ttokens.splice( i, 1 );\n\
-\t\t\t\t\t\tselector = seed.length && toSelector( tokens );\n\
-\t\t\t\t\t\tif ( !selector ) {\n\
-\t\t\t\t\t\t\tpush.apply( results, seed );\n\
-\t\t\t\t\t\t\treturn results;\n\
-\t\t\t\t\t\t}\n\
+\t\t\t// Abort if we hit a combinator\n\
+\t\t\tif ( Expr.relative[ (type = token.type) ] ) {\n\
+\t\t\t\tbreak;\n\
+\t\t\t}\n\
+\t\t\tif ( (find = Expr.find[ type ]) ) {\n\
+\t\t\t\t// Search, expanding context for leading sibling combinators\n\
+\t\t\t\tif ( (seed = find(\n\
+\t\t\t\t\ttoken.matches[0].replace( runescape, funescape ),\n\
+\t\t\t\t\trsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context\n\
+\t\t\t\t)) ) {\n\
 \n\
-\t\t\t\t\t\tbreak;\n\
+\t\t\t\t\t// If seed is empty or no tokens remain, we can return early\n\
+\t\t\t\t\ttokens.splice( i, 1 );\n\
+\t\t\t\t\tselector = seed.length && toSelector( tokens );\n\
+\t\t\t\t\tif ( !selector ) {\n\
+\t\t\t\t\t\tpush.apply( results, seed );\n\
+\t\t\t\t\t\treturn results;\n\
 \t\t\t\t\t}\n\
+\n\
+\t\t\t\t\tbreak;\n\
 \t\t\t\t}\n\
 \t\t\t}\n\
 \t\t}\n\
 \t}\n\
 \n\
-\t// Compile and execute a filtering function\n\
+\t// Compile and execute a filtering function if one is not provided\n\
 \t// Provide `match` to avoid retokenization if we modified the selector above\n\
-\tcompile( selector, match )(\n\
+\t( compiled || compile( selector, match ) )(\n\
 \t\tseed,\n\
 \t\tcontext,\n\
 \t\t!documentIsHTML,\n\
@@ -2544,7 +2570,7 @@ function select( selector, context, results, seed ) {\n\
 \t\trsibling.test( selector ) && testContext( context.parentNode ) || context\n\
 \t);\n\
 \treturn results;\n\
-}\n\
+};\n\
 \n\
 // One-time assignments\n\
 \n\
@@ -3421,8 +3447,9 @@ jQuery.extend({\n\
 \t\treadyList.resolveWith( document, [ jQuery ] );\n\
 \n\
 \t\t// Trigger any bound ready events\n\
-\t\tif ( jQuery.fn.trigger ) {\n\
-\t\t\tjQuery( document ).trigger(\"ready\").off(\"ready\");\n\
+\t\tif ( jQuery.fn.triggerHandler ) {\n\
+\t\t\tjQuery( document ).triggerHandler( \"ready\" );\n\
+\t\t\tjQuery( document ).off( \"ready\" );\n\
 \t\t}\n\
 \t}\n\
 });\n\
@@ -3794,11 +3821,15 @@ jQuery.fn.extend({\n\
 \t\t\t\tif ( elem.nodeType === 1 && !data_priv.get( elem, \"hasDataAttrs\" ) ) {\n\
 \t\t\t\t\ti = attrs.length;\n\
 \t\t\t\t\twhile ( i-- ) {\n\
-\t\t\t\t\t\tname = attrs[ i ].name;\n\
 \n\
-\t\t\t\t\t\tif ( name.indexOf( \"data-\" ) === 0 ) {\n\
-\t\t\t\t\t\t\tname = jQuery.camelCase( name.slice(5) );\n\
-\t\t\t\t\t\t\tdataAttr( elem, name, data[ name ] );\n\
+\t\t\t\t\t\t// Support: IE11+\n\
+\t\t\t\t\t\t// The attrs elements can be null (#14894)\n\
+\t\t\t\t\t\tif ( attrs[ i ] ) {\n\
+\t\t\t\t\t\t\tname = attrs[ i ].name;\n\
+\t\t\t\t\t\t\tif ( name.indexOf( \"data-\" ) === 0 ) {\n\
+\t\t\t\t\t\t\t\tname = jQuery.camelCase( name.slice(5) );\n\
+\t\t\t\t\t\t\t\tdataAttr( elem, name, data[ name ] );\n\
+\t\t\t\t\t\t\t}\n\
 \t\t\t\t\t\t}\n\
 \t\t\t\t\t}\n\
 \t\t\t\t\tdata_priv.set( elem, \"hasDataAttrs\", true );\n\
@@ -4028,10 +4059,17 @@ var rcheckableType = (/^(?:checkbox|radio)$/i);\n\
 \n\
 (function() {\n\
 \tvar fragment = document.createDocumentFragment(),\n\
-\t\tdiv = fragment.appendChild( document.createElement( \"div\" ) );\n\
+\t\tdiv = fragment.appendChild( document.createElement( \"div\" ) ),\n\
+\t\tinput = document.createElement( \"input\" );\n\
 \n\
 \t// #11217 - WebKit loses check when the name is after the checked attribute\n\
-\tdiv.innerHTML = \"<input type='radio' checked='checked' name='t'/>\";\n\
+\t// Support: Windows Web Apps (WWA)\n\
+\t// `name` and `type` need .setAttribute for WWA\n\
+\tinput.setAttribute( \"type\", \"radio\" );\n\
+\tinput.setAttribute( \"checked\", \"checked\" );\n\
+\tinput.setAttribute( \"name\", \"t\" );\n\
+\n\
+\tdiv.appendChild( input );\n\
 \n\
 \t// Support: Safari 5.1, iOS 5.1, Android 4.x, Android 2.3\n\
 \t// old WebKit doesn't clone checked state correctly in fragments\n\
@@ -4051,7 +4089,7 @@ support.focusinBubbles = \"onfocusin\" in window;\n\
 \n\
 var\n\
 \trkeyEvent = /^key/,\n\
-\trmouseEvent = /^(?:mouse|contextmenu)|click/,\n\
+\trmouseEvent = /^(?:mouse|pointer|contextmenu)|click/,\n\
 \trfocusMorph = /^(?:focusinfocus|focusoutblur)$/,\n\
 \trtypenamespace = /^([^.]*)(?:\\.(.+)|)$/;\n\
 \n\
@@ -4620,7 +4658,7 @@ jQuery.event = {\n\
 \n\
 \t\t\t\t// Support: Firefox 20+\n\
 \t\t\t\t// Firefox doesn't alert if the returnValue field is not set.\n\
-\t\t\t\tif ( event.result !== undefined ) {\n\
+\t\t\t\tif ( event.result !== undefined && event.originalEvent ) {\n\
 \t\t\t\t\tevent.originalEvent.returnValue = event.result;\n\
 \t\t\t\t}\n\
 \t\t\t}\n\
@@ -4671,9 +4709,9 @@ jQuery.Event = function( src, props ) {\n\
 \t\t// Events bubbling up the document may have been marked as prevented\n\
 \t\t// by a handler lower down the tree; reflect the correct value.\n\
 \t\tthis.isDefaultPrevented = src.defaultPrevented ||\n\
-\t\t\t\t// Support: Android < 4.0\n\
 \t\t\t\tsrc.defaultPrevented === undefined &&\n\
-\t\t\t\tsrc.getPreventDefault && src.getPreventDefault() ?\n\
+\t\t\t\t// Support: Android < 4.0\n\
+\t\t\t\tsrc.returnValue === false ?\n\
 \t\t\treturnTrue :\n\
 \t\t\treturnFalse;\n\
 \n\
@@ -4720,7 +4758,14 @@ jQuery.Event.prototype = {\n\
 \t\t}\n\
 \t},\n\
 \tstopImmediatePropagation: function() {\n\
+\t\tvar e = this.originalEvent;\n\
+\n\
 \t\tthis.isImmediatePropagationStopped = returnTrue;\n\
+\n\
+\t\tif ( e && e.stopImmediatePropagation ) {\n\
+\t\t\te.stopImmediatePropagation();\n\
+\t\t}\n\
+\n\
 \t\tthis.stopPropagation();\n\
 \t}\n\
 };\n\
@@ -4729,7 +4774,9 @@ jQuery.Event.prototype = {\n\
 // Support: Chrome 15+\n\
 jQuery.each({\n\
 \tmouseenter: \"mouseover\",\n\
-\tmouseleave: \"mouseout\"\n\
+\tmouseleave: \"mouseout\",\n\
+\tpointerenter: \"pointerover\",\n\
+\tpointerleave: \"pointerout\"\n\
 }, function( orig, fix ) {\n\
 \tjQuery.event.special[ orig ] = {\n\
 \t\tdelegateType: fix,\n\
@@ -5154,7 +5201,7 @@ jQuery.extend({\n\
 \t},\n\
 \n\
 \tcleanData: function( elems ) {\n\
-\t\tvar data, elem, events, type, key, j,\n\
+\t\tvar data, elem, type, key,\n\
 \t\t\tspecial = jQuery.event.special,\n\
 \t\t\ti = 0;\n\
 \n\
@@ -5163,9 +5210,8 @@ jQuery.extend({\n\
 \t\t\t\tkey = elem[ data_priv.expando ];\n\
 \n\
 \t\t\t\tif ( key && (data = data_priv.cache[ key ]) ) {\n\
-\t\t\t\t\tevents = Object.keys( data.events || {} );\n\
-\t\t\t\t\tif ( events.length ) {\n\
-\t\t\t\t\t\tfor ( j = 0; (type = events[j]) !== undefined; j++ ) {\n\
+\t\t\t\t\tif ( data.events ) {\n\
+\t\t\t\t\t\tfor ( type in data.events ) {\n\
 \t\t\t\t\t\t\tif ( special[ type ] ) {\n\
 \t\t\t\t\t\t\t\tjQuery.event.remove( elem, type );\n\
 \n\
@@ -5468,14 +5514,15 @@ var iframe,\n\
  */\n\
 // Called only from within defaultDisplay\n\
 function actualDisplay( name, doc ) {\n\
-\tvar elem = jQuery( doc.createElement( name ) ).appendTo( doc.body ),\n\
+\tvar style,\n\
+\t\telem = jQuery( doc.createElement( name ) ).appendTo( doc.body ),\n\
 \n\
 \t\t// getDefaultComputedStyle might be reliably used only on attached element\n\
-\t\tdisplay = window.getDefaultComputedStyle ?\n\
+\t\tdisplay = window.getDefaultComputedStyle && ( style = window.getDefaultComputedStyle( elem[ 0 ] ) ) ?\n\
 \n\
 \t\t\t// Use of this method is a temporary fix (more like optmization) until something better comes along,\n\
 \t\t\t// since it was removed from specification and supported only in FF\n\
-\t\t\twindow.getDefaultComputedStyle( elem[ 0 ] ).display : jQuery.css( elem[ 0 ], \"display\" );\n\
+\t\t\tstyle.display : jQuery.css( elem[ 0 ], \"display\" );\n\
 \n\
 \t// We don't have any data stored on the element,\n\
 \t// so use \"detach\" method as fast way to get rid of the element\n\
@@ -5598,28 +5645,32 @@ function addGetHookIf( conditionFn, hookFn ) {\n\
 \n\
 (function() {\n\
 \tvar pixelPositionVal, boxSizingReliableVal,\n\
-\t\t// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).\n\
-\t\tdivReset = \"padding:0;margin:0;border:0;display:block;-webkit-box-sizing:content-box;\" +\n\
-\t\t\t\"-moz-box-sizing:content-box;box-sizing:content-box\",\n\
 \t\tdocElem = document.documentElement,\n\
 \t\tcontainer = document.createElement( \"div\" ),\n\
 \t\tdiv = document.createElement( \"div\" );\n\
+\n\
+\tif ( !div.style ) {\n\
+\t\treturn;\n\
+\t}\n\
 \n\
 \tdiv.style.backgroundClip = \"content-box\";\n\
 \tdiv.cloneNode( true ).style.backgroundClip = \"\";\n\
 \tsupport.clearCloneStyle = div.style.backgroundClip === \"content-box\";\n\
 \n\
-\tcontainer.style.cssText = \"border:0;width:0;height:0;position:absolute;top:0;left:-9999px;\" +\n\
-\t\t\"margin-top:1px\";\n\
+\tcontainer.style.cssText = \"border:0;width:0;height:0;top:0;left:-9999px;margin-top:1px;\" +\n\
+\t\t\"position:absolute\";\n\
 \tcontainer.appendChild( div );\n\
 \n\
 \t// Executing both pixelPosition & boxSizingReliable tests require only one layout\n\
 \t// so they're executed at the same time to save the second computation.\n\
 \tfunction computePixelPositionAndBoxSizingReliable() {\n\
-\t\t// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).\n\
-\t\tdiv.style.cssText = \"-webkit-box-sizing:border-box;-moz-box-sizing:border-box;\" +\n\
-\t\t\t\"box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;\" +\n\
-\t\t\t\"position:absolute;top:1%\";\n\
+\t\tdiv.style.cssText =\n\
+\t\t\t// Support: Firefox<29, Android 2.3\n\
+\t\t\t// Vendor-prefix box-sizing\n\
+\t\t\t\"-webkit-box-sizing:border-box;-moz-box-sizing:border-box;\" +\n\
+\t\t\t\"box-sizing:border-box;display:block;margin-top:1%;top:1%;\" +\n\
+\t\t\t\"border:1px;padding:1px;width:4px;position:absolute\";\n\
+\t\tdiv.innerHTML = \"\";\n\
 \t\tdocElem.appendChild( container );\n\
 \n\
 \t\tvar divStyle = window.getComputedStyle( div, null );\n\
@@ -5629,9 +5680,10 @@ function addGetHookIf( conditionFn, hookFn ) {\n\
 \t\tdocElem.removeChild( container );\n\
 \t}\n\
 \n\
-\t// Use window.getComputedStyle because jsdom on node.js will break without it.\n\
+\t// Support: node.js jsdom\n\
+\t// Don't assume that getComputedStyle is a property of the global object\n\
 \tif ( window.getComputedStyle ) {\n\
-\t\tjQuery.extend(support, {\n\
+\t\tjQuery.extend( support, {\n\
 \t\t\tpixelPosition: function() {\n\
 \t\t\t\t// This test is executed only once but we still do memoizing\n\
 \t\t\t\t// since we can use the boxSizingReliable pre-computing.\n\
@@ -5653,7 +5705,13 @@ function addGetHookIf( conditionFn, hookFn ) {\n\
 \t\t\t\t// This support function is only executed once so no memoizing is needed.\n\
 \t\t\t\tvar ret,\n\
 \t\t\t\t\tmarginDiv = div.appendChild( document.createElement( \"div\" ) );\n\
-\t\t\t\tmarginDiv.style.cssText = div.style.cssText = divReset;\n\
+\n\
+\t\t\t\t// Reset CSS: box-sizing; display; margin; border; padding\n\
+\t\t\t\tmarginDiv.style.cssText = div.style.cssText =\n\
+\t\t\t\t\t// Support: Firefox<29, Android 2.3\n\
+\t\t\t\t\t// Vendor-prefix box-sizing\n\
+\t\t\t\t\t\"-webkit-box-sizing:content-box;-moz-box-sizing:content-box;\" +\n\
+\t\t\t\t\t\"box-sizing:content-box;display:block;margin:0;border:0;padding:0\";\n\
 \t\t\t\tmarginDiv.style.marginRight = marginDiv.style.width = \"0\";\n\
 \t\t\t\tdiv.style.width = \"1px\";\n\
 \t\t\t\tdocElem.appendChild( container );\n\
@@ -5661,9 +5719,6 @@ function addGetHookIf( conditionFn, hookFn ) {\n\
 \t\t\t\tret = !parseFloat( window.getComputedStyle( marginDiv, null ).marginRight );\n\
 \n\
 \t\t\t\tdocElem.removeChild( container );\n\
-\n\
-\t\t\t\t// Clean up the div for other support tests.\n\
-\t\t\t\tdiv.innerHTML = \"\";\n\
 \n\
 \t\t\t\treturn ret;\n\
 \t\t\t}\n\
@@ -5703,8 +5758,8 @@ var\n\
 \n\
 \tcssShow = { position: \"absolute\", visibility: \"hidden\", display: \"block\" },\n\
 \tcssNormalTransform = {\n\
-\t\tletterSpacing: 0,\n\
-\t\tfontWeight: 400\n\
+\t\tletterSpacing: \"0\",\n\
+\t\tfontWeight: \"400\"\n\
 \t},\n\
 \n\
 \tcssPrefixes = [ \"Webkit\", \"O\", \"Moz\", \"ms\" ];\n\
@@ -5851,13 +5906,10 @@ function showHide( elements, show ) {\n\
 \t\t\t\tvalues[ index ] = data_priv.access( elem, \"olddisplay\", defaultDisplay(elem.nodeName) );\n\
 \t\t\t}\n\
 \t\t} else {\n\
+\t\t\thidden = isHidden( elem );\n\
 \n\
-\t\t\tif ( !values[ index ] ) {\n\
-\t\t\t\thidden = isHidden( elem );\n\
-\n\
-\t\t\t\tif ( display && display !== \"none\" || !hidden ) {\n\
-\t\t\t\t\tdata_priv.set( elem, \"olddisplay\", hidden ? display : jQuery.css(elem, \"display\") );\n\
-\t\t\t\t}\n\
+\t\t\tif ( display !== \"none\" || !hidden ) {\n\
+\t\t\t\tdata_priv.set( elem, \"olddisplay\", hidden ? display : jQuery.css( elem, \"display\" ) );\n\
 \t\t\t}\n\
 \t\t}\n\
 \t}\n\
@@ -5896,6 +5948,8 @@ jQuery.extend({\n\
 \tcssNumber: {\n\
 \t\t\"columnCount\": true,\n\
 \t\t\"fillOpacity\": true,\n\
+\t\t\"flexGrow\": true,\n\
+\t\t\"flexShrink\": true,\n\
 \t\t\"fontWeight\": true,\n\
 \t\t\"lineHeight\": true,\n\
 \t\t\"opacity\": true,\n\
@@ -5960,9 +6014,6 @@ jQuery.extend({\n\
 \n\
 \t\t\t// If a hook was provided, use that value, otherwise just set the specified value\n\
 \t\t\tif ( !hooks || !(\"set\" in hooks) || (value = hooks.set( elem, value, extra )) !== undefined ) {\n\
-\t\t\t\t// Support: Chrome, Safari\n\
-\t\t\t\t// Setting style to blank string required to delete \"style: x !important;\"\n\
-\t\t\t\tstyle[ name ] = \"\";\n\
 \t\t\t\tstyle[ name ] = value;\n\
 \t\t\t}\n\
 \n\
@@ -6018,7 +6069,7 @@ jQuery.each([ \"height\", \"width\" ], function( i, name ) {\n\
 \t\t\tif ( computed ) {\n\
 \t\t\t\t// certain elements can have dimension info if we invisibly show them\n\
 \t\t\t\t// however, it must have a current display style that would benefit from this\n\
-\t\t\t\treturn elem.offsetWidth === 0 && rdisplayswap.test( jQuery.css( elem, \"display\" ) ) ?\n\
+\t\t\t\treturn rdisplayswap.test( jQuery.css( elem, \"display\" ) ) && elem.offsetWidth === 0 ?\n\
 \t\t\t\t\tjQuery.swap( elem, cssShow, function() {\n\
 \t\t\t\t\t\treturn getWidthOrHeight( elem, name, extra );\n\
 \t\t\t\t\t}) :\n\
@@ -6339,7 +6390,7 @@ function createTween( value, prop, animation ) {\n\
 \n\
 function defaultPrefilter( elem, props, opts ) {\n\
 \t/* jshint validthis: true */\n\
-\tvar prop, value, toggle, tween, hooks, oldfire, display,\n\
+\tvar prop, value, toggle, tween, hooks, oldfire, display, checkDisplay,\n\
 \t\tanim = this,\n\
 \t\torig = {},\n\
 \t\tstyle = elem.style,\n\
@@ -6383,13 +6434,12 @@ function defaultPrefilter( elem, props, opts ) {\n\
 \t\t// Set display property to inline-block for height/width\n\
 \t\t// animations on inline elements that are having width/height animated\n\
 \t\tdisplay = jQuery.css( elem, \"display\" );\n\
-\t\t// Get default display if display is currently \"none\"\n\
-\t\tif ( display === \"none\" ) {\n\
-\t\t\tdisplay = defaultDisplay( elem.nodeName );\n\
-\t\t}\n\
-\t\tif ( display === \"inline\" &&\n\
-\t\t\t\tjQuery.css( elem, \"float\" ) === \"none\" ) {\n\
 \n\
+\t\t// Test default display if display is currently \"none\"\n\
+\t\tcheckDisplay = display === \"none\" ?\n\
+\t\t\tdata_priv.get( elem, \"olddisplay\" ) || defaultDisplay( elem.nodeName ) : display;\n\
+\n\
+\t\tif ( checkDisplay === \"inline\" && jQuery.css( elem, \"float\" ) === \"none\" ) {\n\
 \t\t\tstyle.display = \"inline-block\";\n\
 \t\t}\n\
 \t}\n\
@@ -6419,6 +6469,10 @@ function defaultPrefilter( elem, props, opts ) {\n\
 \t\t\t\t}\n\
 \t\t\t}\n\
 \t\t\torig[ prop ] = dataShow && dataShow[ prop ] || jQuery.style( elem, prop );\n\
+\n\
+\t\t// Any non-fx value stops us from restoring the original display value\n\
+\t\t} else {\n\
+\t\t\tdisplay = undefined;\n\
 \t\t}\n\
 \t}\n\
 \n\
@@ -6461,6 +6515,10 @@ function defaultPrefilter( elem, props, opts ) {\n\
 \t\t\t\t}\n\
 \t\t\t}\n\
 \t\t}\n\
+\n\
+\t// If this is a noop like .hide().hide(), restore an overwritten display value\n\
+\t} else if ( (display === \"none\" ? defaultDisplay( elem.nodeName ) : display) === \"inline\" ) {\n\
+\t\tstyle.display = display;\n\
 \t}\n\
 }\n\
 \n\
@@ -7354,6 +7412,16 @@ jQuery.fn.extend({\n\
 \n\
 jQuery.extend({\n\
 \tvalHooks: {\n\
+\t\toption: {\n\
+\t\t\tget: function( elem ) {\n\
+\t\t\t\tvar val = jQuery.find.attr( elem, \"value\" );\n\
+\t\t\t\treturn val != null ?\n\
+\t\t\t\t\tval :\n\
+\t\t\t\t\t// Support: IE10-11+\n\
+\t\t\t\t\t// option.text throws exceptions (#14686, #14858)\n\
+\t\t\t\t\tjQuery.trim( jQuery.text( elem ) );\n\
+\t\t\t}\n\
+\t\t},\n\
 \t\tselect: {\n\
 \t\t\tget: function( elem ) {\n\
 \t\t\t\tvar value, option,\n\
@@ -7400,7 +7468,7 @@ jQuery.extend({\n\
 \n\
 \t\t\t\twhile ( i-- ) {\n\
 \t\t\t\t\toption = options[ i ];\n\
-\t\t\t\t\tif ( (option.selected = jQuery.inArray( jQuery(option).val(), values ) >= 0) ) {\n\
+\t\t\t\t\tif ( (option.selected = jQuery.inArray( option.value, values ) >= 0) ) {\n\
 \t\t\t\t\t\toptionSet = true;\n\
 \t\t\t\t\t}\n\
 \t\t\t\t}\n\
@@ -8611,10 +8679,15 @@ jQuery.ajaxTransport(function( options ) {\n\
 \t\t\t\t// Create the abort callback\n\
 \t\t\t\tcallback = xhrCallbacks[ id ] = callback(\"abort\");\n\
 \n\
-\t\t\t\t// Do send the request\n\
-\t\t\t\t// This may raise an exception which is actually\n\
-\t\t\t\t// handled in jQuery.ajax (so no try/catch here)\n\
-\t\t\t\txhr.send( options.hasContent && options.data || null );\n\
+\t\t\t\ttry {\n\
+\t\t\t\t\t// Do send the request (this may raise an exception)\n\
+\t\t\t\t\txhr.send( options.hasContent && options.data || null );\n\
+\t\t\t\t} catch ( e ) {\n\
+\t\t\t\t\t// #14683: Only rethrow if this hasn't been notified as an error yet\n\
+\t\t\t\t\tif ( callback ) {\n\
+\t\t\t\t\t\tthrow e;\n\
+\t\t\t\t\t}\n\
+\t\t\t\t}\n\
 \t\t\t},\n\
 \n\
 \t\t\tabort: function() {\n\
@@ -8821,7 +8894,7 @@ jQuery.fn.load = function( url, params, callback ) {\n\
 \t\toff = url.indexOf(\" \");\n\
 \n\
 \tif ( off >= 0 ) {\n\
-\t\tselector = url.slice( off );\n\
+\t\tselector = jQuery.trim( url.slice( off ) );\n\
 \t\turl = url.slice( 0, off );\n\
 \t}\n\
 \n\
@@ -9129,6 +9202,12 @@ jQuery.fn.andSelf = jQuery.fn.addBack;\n\
 // derived from file names, and jQuery is normally delivered in a lowercase\n\
 // file name. Do this after creating the global so that if an AMD module wants\n\
 // to call noConflict to hide this version of jQuery, it will work.\n\
+\n\
+// Note that for maximum portability, libraries that are not jQuery should\n\
+// declare themselves as anonymous modules, and avoid setting a global if an\n\
+// AMD loader is present. jQuery is a special case. For more information, see\n\
+// https://github.com/jrburke/requirejs/wiki/Updating-existing-libraries#wiki-anon\n\
+\n\
 if ( typeof define === \"function\" && define.amd ) {\n\
 \tdefine( \"jquery\", [], function() {\n\
 \t\treturn jQuery;\n\
@@ -9170,13 +9249,12 @@ if ( typeof noGlobal === strundefined ) {\n\
 return jQuery;\n\
 \n\
 }));\n\
-\n\
-//# sourceURL=components/components/jquery/2.1.0/jquery.js"
+//# sourceURL=components/components/jquery/2.1.1/jquery.js"
 ));
 
-require.modules["components-jquery"] = require.modules["components~jquery@2.1.0"];
-require.modules["components~jquery"] = require.modules["components~jquery@2.1.0"];
-require.modules["jquery"] = require.modules["components~jquery@2.1.0"];
+require.modules["components-jquery"] = require.modules["components~jquery@2.1.1"];
+require.modules["components~jquery"] = require.modules["components~jquery@2.1.1"];
+require.modules["jquery"] = require.modules["components~jquery@2.1.1"];
 
 
 require.register("lodash~lodash@2.4.1", Function("exports, module",
@@ -16445,7 +16523,7 @@ require.register("sidebar", Function("exports, module",
 "\n\
 \n\
 var template = require(\"sidebar/templates/sidebar.hbs\");\n\
-var jquery = require(\"components~jquery@2.1.0\");\n\
+var jquery = require(\"components~jquery@2.1.1\");\n\
 var lodash = require(\"lodash~lodash@2.4.1\");\n\
 \n\
 function sidebar(deferredLoading) {\n\
