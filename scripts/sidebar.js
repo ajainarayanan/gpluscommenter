@@ -60,4 +60,4 @@ function sidebar(deferredLoading) {
     loadComments: loadComments
   };
 }
-module.exports = sidebar();
+module.exports = new sidebar();

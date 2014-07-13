@@ -16582,7 +16582,7 @@ function sidebar(deferredLoading) {\n\
     loadComments: loadComments\n\
   };\n\
 }\n\
-module.exports = sidebar();\n\
+module.exports = new sidebar();\n\
 \n\
 //# sourceURL=scripts/sidebar.js"
 ));
