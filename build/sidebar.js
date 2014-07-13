@@ -16527,61 +16527,66 @@ var jquery = require(\"components~jquery@2.1.1\");\n\
 var lodash = require(\"lodash~lodash@2.4.1\");\n\
 \n\
 function sidebar(deferredLoading) {\n\
-\n\
-  function bindEvents() {\n\
-    this.element.bind(\"click\", function (event) {\n\
-      var target = jquery(event.target);\n\
-      target.parent(\".sidebar\").toggleClass(\"pullLeft\");\n\
-    });\n\
-    jquery(window).resize(lodash.debounce(function onResize(event) {\n\
-      resizeHandler(event);\n\
-    }, 200));\n\
-  }\n\
-  function resizeHandler(e) {\n\
-    if(this.outerHeight > window.outerHeight) {\n\
-      return;\n\
-    }\n\
-    this.element.find(\"#commentsholder\").empty();\n\
-    loadComments(this.url);\n\
-  }\n\
-\n\
-  function attach(element, url) {\n\
-    var el = element || \"body\";\n\
-    jquery(el).append(template);\n\
-    this.element = jquery(el).find(\".sidebar\");\n\
-    this.url = url || window.location;\n\
-    bindEvents();\n\
-    loadComments(url);\n\
-    this.outerHeight = window.outerHeight;\n\
-  }\n\
-\n\
-  function loadComments(url) {\n\
-    var sidebarWidth = parseInt(jquery(\"body\").css(\"width\") || 0, 10);\n\
-    gapi.comments.render(\"commentsholder\", {\n\
-      href: url || window.location,\n\
-      width: Math.round((sidebarWidth * (1/2)).toString()),\n\
-      first_party_property: 'BLOGGER',\n\
-      view_type: 'FILTERED_POSTMOD'\n\
-    });\n\
-  }\n\
-\n\
   if (!deferredLoading) {\n\
       var angular = angular || null;\n\
       if (angular && angular.element) {\n\
         angular.element(document).ready(function() {\n\
-          attach();\n\
+          this.attach();\n\
         }.bind(this))\n\
       } else {\n\
         jquery(document).ready(function() {\n\
-          attach();\n\
+          this.attach();\n\
         }.bind(this));\n\
       }\n\
   }\n\
-  return {\n\
-    attach: attach,\n\
-    loadComments: loadComments\n\
-  };\n\
+  this.isKeyboard = false;\n\
+  lodash.bindAll(this);\n\
+  return this;\n\
 }\n\
+\n\
+sidebar.prototype.bindEvents = function (){\n\
+  this.element.bind(\"click\", function (event) {\n\
+    var target = jquery(event.target);\n\
+    target.parent(\".sidebar\").toggleClass(\"pullLeft\");\n\
+  });\n\
+  jquery(window).resize(lodash.debounce(function onResize(event) {\n\
+    this.resizeHandler(event)\n\
+  }.bind(this), 200));\n\
+}\n\
+\n\
+sidebar.prototype.resizeHandler = function(e) {\n\
+  if(!this.isKeyboard && this.innerHeight > window.innerHeight) {\n\
+    this.isKeyboard = true;\n\
+    return;\n\
+  } else if (this.isKeyboard) {\n\
+    this.isKeyboard = false;\n\
+    return;\n\
+  }\n\
+  this.element.find(\"#commentsholder\").empty();\n\
+  this.loadComments(this.url);\n\
+}\n\
+\n\
+sidebar.prototype.attach = function(element, url) {\n\
+  var el = element || \"body\";\n\
+  jquery(el).append(template);\n\
+  this.element = jquery(el).find(\".sidebar\");\n\
+  this.url = url || window.location;\n\
+  this.bindEvents();\n\
+  this.loadComments(url);\n\
+  this.innerHeight = window.innerHeight;\n\
+}\n\
+\n\
+sidebar.prototype.loadComments = function(url) {\n\
+  var sidebarWidth = parseInt(jquery(\"body\").css(\"width\") || 0, 10);\n\
+  gapi.comments.render(\"commentsholder\", {\n\
+    href: url || window.location,\n\
+    width: Math.round((sidebarWidth * 0.65).toString()),\n\
+    first_party_property: 'BLOGGER',\n\
+    view_type: 'FILTERED_POSTMOD'\n\
+  });\n\
+}\n\
+\n\
+\n\
 module.exports = new sidebar();\n\
 \n\
 //# sourceURL=scripts/sidebar.js"

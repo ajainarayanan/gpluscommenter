@@ -5,7 +5,6 @@
 .sidebar {
   animation: push 1s forwards;
   -webkit-animation: push 1s forwards;
-  padding: 30px 0px;
   background: transparent;
   display: inline-block;
   position: fixed;
@@ -15,7 +14,7 @@
   width: auto;
   z-index: 10000009922;
   position: fixed;
-  top: 0;
+  top: 15%;
 
   .commentsWrapper{
     display: inline-block;
