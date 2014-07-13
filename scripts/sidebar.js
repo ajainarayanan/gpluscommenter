@@ -40,6 +40,7 @@ function sidebar(deferredLoading) {
   }
 
   if (!deferredLoading) {
+      var angular = angular || null;
       if (angular && angular.element) {
         angular.element(document).ready(function() {
           attach();

@@ -16562,6 +16562,7 @@ function sidebar(deferredLoading) {\n\
   }\n\
 \n\
   if (!deferredLoading) {\n\
+      var angular = angular || null;\n\
       if (angular && angular.element) {\n\
         angular.element(document).ready(function() {\n\
           attach();\n\
