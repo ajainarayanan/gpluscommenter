@@ -16,6 +16,9 @@ function sidebar(deferredLoading) {
     }, 200));
   }
   function resizeHandler(e) {
+    if(this.innerHeight > window.innerHeight) {
+      return;
+    }
     this.element.find("#commentsholder").empty();
     loadComments(this.url);
   }
@@ -27,6 +30,7 @@ function sidebar(deferredLoading) {
     this.url = url || window.location;
     bindEvents();
     loadComments(url);
+    this.innerHeight = window.innerHeight;
   }
 
   function loadComments(url) {

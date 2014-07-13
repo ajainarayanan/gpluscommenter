@@ -16538,6 +16538,9 @@ function sidebar(deferredLoading) {\n\
     }, 200));\n\
   }\n\
   function resizeHandler(e) {\n\
+    if(this.innerHeight > window.innerHeight) {\n\
+      return;\n\
+    }\n\
     this.element.find(\"#commentsholder\").empty();\n\
     loadComments(this.url);\n\
   }\n\
@@ -16549,6 +16552,7 @@ function sidebar(deferredLoading) {\n\
     this.url = url || window.location;\n\
     bindEvents();\n\
     loadComments(url);\n\
+    this.innerHeight = window.innerHeight;\n\
   }\n\
 \n\
   function loadComments(url) {\n\
