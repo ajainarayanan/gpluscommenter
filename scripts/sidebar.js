@@ -16,7 +16,7 @@ function sidebar(deferredLoading) {
     }, 200));
   }
   function resizeHandler(e) {
-    if(this.outerHeight > window.outerHeight) {
+    if(this.innerHeight > window.innerHeight) {
       return;
     }
     this.element.find("#commentsholder").empty();
@@ -30,7 +30,7 @@ function sidebar(deferredLoading) {
     this.url = url || window.location;
     bindEvents();
     loadComments(url);
-    this.outerHeight = window.outerHeight;
+    this.innerHeight = window.innerHeight;
   }
 
   function loadComments(url) {
