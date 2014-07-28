@@ -2,20 +2,26 @@
 @import "./socialFonts";
 @import "./gPlus";
 
+
 .sidebar {
-  animation: push 1s forwards;
-  -webkit-animation: push 1s forwards;
   background: transparent;
   display: inline-block;
   position: fixed;
   margin: 0px 15px;
   cursor: pointer;
-  font-size: 16px;
   width: auto;
   z-index: 10000009922;
   position: fixed;
   top: 15%;
 
+  .gplus.title-icon{
+    animation: pushIcon 1s forwards;
+    -webkit-animation: pushIcon 1s forwards;
+  }
+  .gplus.title-icon.pullIcon{
+    animation: pullIcon 1s forwards;
+    -webkit-animation: pullIcon 1s forwards;
+  }
   .commentsWrapper{
     display: inline-block;
 
@@ -30,9 +36,16 @@
 
     }
   }
+  &.push {
+    right: -65%;
+  }
+  &.pushLeft {
+    animation: push 1s forwards;
+    -webkit-animation: push 1s forwards;
+  }
   &.pullLeft {
     animation: pull 1s forwards;
-    -webkit-animation: pull 1s forwards;
+    -webkit-animation: pull  1s forwards;
   }
   .hide {
     display: none;

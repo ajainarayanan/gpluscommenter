@@ -17,6 +17,7 @@ function sidebar(deferredLoading) {
         }.bind(this));
       }
   }
+
   this.isKeyboard = false;
   lodash.bindAll(this);
   return this;
@@ -25,11 +26,25 @@ function sidebar(deferredLoading) {
 sidebar.prototype.bindEvents = function (){
   this.element.bind("click", function (event) {
     var target = jquery(event.target);
-    target.parent(".sidebar").toggleClass("pullLeft");
+    jquery("div[attachpoint=tabIcon]").toggleClass("pullIcon");
+    if (target.parent(".sidebar").hasClass("push") || target.parent(".sidebar").hasClass("pushLeft")) {
+      target.parent(".sidebar").removeClass("push");
+      target.parent(".sidebar").removeClass("pushLeft");
+      target.parent(".sidebar").addClass("pullLeft");
+    } else {
+      target.parent(".sidebar").removeClass("pullLeft");
+      target.parent(".sidebar").addClass("pushLeft");
+    }
   });
   jquery(window).resize(lodash.debounce(function onResize(event) {
     this.resizeHandler(event)
   }.bind(this), 200));
+
+  jquery(window).on("hashchange", function() {
+    this.url = window.location.href;
+    this.element.find("#commentsholder").empty();
+    this.loadComments(this.url);
+  }.bind(this));
 }
 
 sidebar.prototype.resizeHandler = function(e) {

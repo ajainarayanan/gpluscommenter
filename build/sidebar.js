@@ -16539,6 +16539,7 @@ function sidebar(deferredLoading) {\n\
         }.bind(this));\n\
       }\n\
   }\n\
+\n\
   this.isKeyboard = false;\n\
   lodash.bindAll(this);\n\
   return this;\n\
@@ -16547,11 +16548,25 @@ function sidebar(deferredLoading) {\n\
 sidebar.prototype.bindEvents = function (){\n\
   this.element.bind(\"click\", function (event) {\n\
     var target = jquery(event.target);\n\
-    target.parent(\".sidebar\").toggleClass(\"pullLeft\");\n\
+    jquery(\"div[attachpoint=tabIcon]\").toggleClass(\"pullIcon\");\n\
+    if (target.parent(\".sidebar\").hasClass(\"push\") || target.parent(\".sidebar\").hasClass(\"pushLeft\")) {\n\
+      target.parent(\".sidebar\").removeClass(\"push\");\n\
+      target.parent(\".sidebar\").removeClass(\"pushLeft\");\n\
+      target.parent(\".sidebar\").addClass(\"pullLeft\");\n\
+    } else {\n\
+      target.parent(\".sidebar\").removeClass(\"pullLeft\");\n\
+      target.parent(\".sidebar\").addClass(\"pushLeft\");\n\
+    }\n\
   });\n\
   jquery(window).resize(lodash.debounce(function onResize(event) {\n\
     this.resizeHandler(event)\n\
   }.bind(this), 200));\n\
+\n\
+  jquery(window).on(\"hashchange\", function() {\n\
+    this.url = window.location.href;\n\
+    this.element.find(\"#commentsholder\").empty();\n\
+    this.loadComments(this.url);\n\
+  }.bind(this));\n\
 }\n\
 \n\
 sidebar.prototype.resizeHandler = function(e) {\n\
@@ -16592,7 +16607,7 @@ module.exports = new sidebar();\n\
 //# sourceURL=scripts/sidebar.js"
 ));
 
-require.define("sidebar/templates/sidebar.hbs", "<div class=\"sidebar pull\">\n  <div class=\"gplus title-icon icon-google-plus\" attachpoint= \"tabIcon\" name=\"gplus\"></div>\n  <div class=\"commentsWrapper\">\n    <div class=\"comments holder\" id=\"commentsholder\">\n\n    <div>\n  </div>\n</div>\n");
+require.define("sidebar/templates/sidebar.hbs", "<div class=\"sidebar push\">\n  <div class=\"gplus title-icon icon-google-plus\" attachpoint= \"tabIcon\" name=\"gplus\"></div>\n  <div class=\"commentsWrapper\">\n    <div class=\"comments holder\" id=\"commentsholder\">\n\n    <div>\n  </div>\n</div>\n");
 
 require.modules["sidebar"] = require.modules["sidebar"];
 

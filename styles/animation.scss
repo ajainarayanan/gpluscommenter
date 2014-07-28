@@ -35,3 +35,37 @@ $minWidth: 5px;
         right: -($maxWidth);
     }
 }
+
+@keyframes pullIcon{
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(720deg);
+    }
+}
+@-webkit-keyframes pullIcon {
+  0% {
+      -webkit-transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(720deg);
+  }
+}
+
+@keyframes pushIcon{
+    0% {
+        transform: rotate(720deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+@-webkit-keyframes pushIcon{
+    0% {
+        transform: rotate(720deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}

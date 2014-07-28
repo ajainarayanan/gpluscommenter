@@ -22,6 +22,36 @@
 
   100% {
     right: -65%; } }
+@keyframes pullIcon {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(720deg);
+    transform: rotate(720deg); } }
+@-webkit-keyframes pullIcon {
+  0% {
+    -webkit-transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(720deg); } }
+@keyframes pushIcon {
+  0% {
+    -webkit-transform: rotate(720deg);
+    transform: rotate(720deg); }
+
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); } }
+@-webkit-keyframes pushIcon {
+  0% {
+    -webkit-transform: rotate(720deg);
+    transform: rotate(720deg); }
+
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); } }
 @font-face {
   font-family: 'icomoon';
   src: url("sidebar/styles/fonts/icomoon.eot?-v1jwtk");
@@ -83,18 +113,21 @@
     display: inline-block; }
 
 .sidebar {
-  animation: push 1s forwards;
-  -webkit-animation: push 1s forwards;
   background: transparent;
   display: inline-block;
   position: fixed;
   margin: 0px 15px;
   cursor: pointer;
-  font-size: 16px;
   width: auto;
   z-index: 10000009922;
   position: fixed;
   top: 15%; }
+  .sidebar .gplus.title-icon {
+    animation: pushIcon 1s forwards;
+    -webkit-animation: pushIcon 1s forwards; }
+  .sidebar .gplus.title-icon.pullIcon {
+    animation: pullIcon 1s forwards;
+    -webkit-animation: pullIcon 1s forwards; }
   .sidebar .commentsWrapper {
     display: inline-block; }
     .sidebar .commentsWrapper .holder {
@@ -104,9 +137,14 @@
       display: inline-block; }
       .sidebar .commentsWrapper .holder.visible {
         right: 50px; }
+  .sidebar.push {
+    right: -65%; }
+  .sidebar.pushLeft {
+    animation: push 1s forwards;
+    -webkit-animation: push 1s forwards; }
   .sidebar.pullLeft {
     animation: pull 1s forwards;
-    -webkit-animation: pull 1s forwards; }
+    -webkit-animation: pull  1s forwards; }
   .sidebar .hide {
     display: none; }
 
